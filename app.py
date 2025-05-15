@@ -27,12 +27,15 @@ def index():
 
 @socketio.on('send_message')
 def handle_send(data):
-    username = data.get('username')
+    # Ignore the username sent by client, always set "anom"
+    username = "anom"
     message = data.get('message')
+
     with sqlite3.connect(DB_FILE) as conn:
         c = conn.cursor()
         c.execute("INSERT INTO messages (username, message) VALUES (?, ?)", (username, message))
         conn.commit()
+
     emit('receive_message', {'username': username, 'message': message}, broadcast=True)
 
 if __name__ == '__main__':
