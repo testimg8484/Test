@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Public Chat</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Public Chat Room</h2>
+    <div id="messages">
+        {% for username, message in messages %}
+            <p><strong>{{ username }}:</strong> {{ message }}</p>
+        {% endfor %}
+    </div>
+    <input id="username" placeholder="Your name" />
+    <input id="message" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        var socket = io();
+
+        socket.on('receive_message', function(data) {
+            const msgBox = document.getElementById('messages');
+            msgBox.innerHTML += `<p><strong>${data.username}:</strong> ${data.message}</p>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
+        });
+
+        function sendMessage() {
+            const username = document.getElementById('username').value;
+            const message = document.getElementById('message').value;
+            if (username && message) {
+                socket.emit('send_message', { username, message });
+                document.getElementById('message').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
