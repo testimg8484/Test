@@ -1,41 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Public Chat</title>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <style>
-        body { font-family: Arial; }
-        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
-    </style>
+  <title>Public Chat Room</title>
+  <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
 </head>
 <body>
-    <h2>Public Chat Room</h2>
-    <div id="messages">
-        {% for username, message in messages %}
-            <p><strong>{{ username }}:</strong> {{ message }}</p>
-        {% endfor %}
-    </div>
-    <input id="username" placeholder="Your name" />
-    <input id="message" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
+  <h1>Chat Room</h1>
+  <ul id="messages">
+    {% for username, message in messages %}
+      <li><strong>{{ username }}</strong>: {{ message }}</li>
+    {% endfor %}
+  </ul>
+  <form id="chat-form">
+    <!-- Removed username input -->
+    <input type="text" id="message" placeholder="Type a message" required autocomplete="off" />
+    <button type="submit">Send</button>
+  </form>
 
-    <script>
-        var socket = io();
+  <script>
+    const socket = io();
+    const form = document.getElementById('chat-form');
+    const messages = document.getElementById('messages');
 
-        socket.on('receive_message', function(data) {
-            const msgBox = document.getElementById('messages');
-            msgBox.innerHTML += `<p><strong>${data.username}:</strong> ${data.message}</p>`;
-            msgBox.scrollTop = msgBox.scrollHeight;
-        });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const message = document.getElementById('message').value;
 
-        function sendMessage() {
-            const username = document.getElementById('username').value;
-            const message = document.getElementById('message').value;
-            if (username && message) {
-                socket.emit('send_message', { username, message });
-                document.getElementById('message').value = '';
-            }
-        }
-    </script>
+      // Send message with username "anom"
+      socket.emit('send_message', { username: "anom", message: message });
+
+      form.reset();
+    });
+
+    socket.on('receive_message', data => {
+      const item = document.createElement('li');
+      item.innerHTML = `<strong>${data.username}</strong>: ${data.message}`;
+      messages.appendChild(item);
+    });
+  </script>
 </body>
 </html>
