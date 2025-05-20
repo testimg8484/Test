@@ -21,7 +21,7 @@ def init_db():
 def login():
     if request.method == 'POST':
         password = request.form.get('password')
-        if password == '12345':
+        if password == '09876':
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
